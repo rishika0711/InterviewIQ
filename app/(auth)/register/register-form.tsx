@@ -7,6 +7,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { Brain, Loader2 } from "lucide-react";
 import { registerUser, type ActionState } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
+import { GoogleLogo } from "@/components/icons/GoogleLogo";
 import {
   Card,
   CardContent,
@@ -124,9 +125,7 @@ export function RegisterForm({ googleEnabled }: RegisterFormProps) {
                   {googleLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                   ) : (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-muted text-[10px] font-bold tracking-tighter">
-                      G
-                    </span>
+                    <GoogleLogo className="h-5 w-5" />
                   )}
                   {googleLoading ? "Redirecting to Google…" : "Continue with Google"}
                 </Button>

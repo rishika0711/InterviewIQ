@@ -165,7 +165,7 @@ export function HistoryAttemptCard({
           <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground">
             {contentPreview}
           </p>
-          <span className="hidden shrink-0 items-center gap-1 text-xs font-semibold text-primary opacity-0 transition-opacity group-hover/block:opacity-100 sm:inline-flex">
+          <span className="hidden shrink-0 items-center gap-1 text-xs font-semibold text-primary transition-transform group-hover/block:translate-x-0.5 sm:inline-flex">
             Open
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </span>

@@ -12,11 +12,17 @@ export const LoginSchema = z.object({
 });
 
 export const SubmitAnswerSchema = z.object({
-  questionId: z.string().min(1, "Invalid question ID"),
-  content: z
-    .string()
-    .min(1, "Answer cannot be empty")
-    .max(3000, "Answer too long"),
+  questionId: z.preprocess(
+    (val) => (val == null ? "" : val),
+    z.string().min(1, "Invalid question ID")
+  ),
+  content: z.preprocess(
+    (val) => (val == null ? "" : val),
+    z
+      .string()
+      .min(1, "Answer cannot be empty")
+      .max(3000, "Answer too long")
+  ),
 });
 
 export const FeedbackSchema = z.object({

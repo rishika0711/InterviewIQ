@@ -12,9 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { FeedbackPanel } from "./FeedbackPanel";
-import { RotateCcw, Loader2 } from "lucide-react";
+import { RotateCcw, Loader2, Mic, Square } from "lucide-react";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 
 const initialSubmitState: SubmitAnswerState = {};
+const MAX_ANSWER_CHARS = 3000;
 
 function AnswerComposeForm({
   questionId,
@@ -23,10 +25,22 @@ function AnswerComposeForm({
   questionId: string;
   onAttemptCreated: (attemptId: string) => void;
 }) {
+  const [content, setContent] = useState("");
   const [state, formAction, isPending] = useActionState(
     submitAnswerAction,
     initialSubmitState
   );
+
+  const { isListening, stop, toggle, isSupported, errorMessage } =
+    useSpeechRecognition({
+      onTranscript: setContent,
+    });
+
+  useEffect(() => {
+    if (isPending && isListening) {
+      stop();
+    }
+  }, [isPending, isListening, stop]);
 
   useEffect(() => {
     if (!state.attemptId) return;
@@ -38,14 +52,51 @@ function AnswerComposeForm({
       <input type="hidden" name="questionId" value={questionId} />
       <Textarea
         name="content"
-        placeholder="Write your answer here (minimum 50 characters)..."
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Write your answer here..."
         rows={11}
         required
-        minLength={50}
-        maxLength={3000}
-        disabled={isPending}
+        maxLength={MAX_ANSWER_CHARS}
+        disabled={isPending || isListening}
         className="min-h-[220px] rounded-xl border-border/80 resize-y shadow-sm focus-visible:ring-primary/40 text-[15px] leading-relaxed"
       />
+      {isSupported && (
+        <div className="flex flex-col items-end gap-2">
+          <Button
+            type="button"
+            variant={isListening ? "destructive" : "outline"}
+            size="sm"
+            disabled={isPending}
+            aria-label={isListening ? "Stop dictation" : "Start voice dictation"}
+            className={`rounded-xl gap-2 ${isListening ? "ring-2 ring-destructive/40 ring-offset-2 ring-offset-background" : ""}`}
+            aria-pressed={isListening}
+            onClick={() => toggle(content)}
+          >
+            {isListening ? (
+              <>
+                <Square className="h-3.5 w-3.5 fill-current" aria-hidden />
+                Stop dictation
+              </>
+            ) : (
+              <>
+                <Mic className="h-4 w-4" aria-hidden />
+                Dictate
+              </>
+            )}
+          </Button>
+          {errorMessage && (
+            <p className="text-xs text-destructive text-right max-w-md">
+              {errorMessage}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground text-right max-w-md">
+            {isListening
+              ? "Pause typing while recording — Stop dictation to edit."
+              : "Works in Chrome and Edge — uses your microphone."}
+          </p>
+        </div>
+      )}
       {state.error && (
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm font-medium text-destructive">
           {state.error}

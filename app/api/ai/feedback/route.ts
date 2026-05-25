@@ -44,10 +44,12 @@ export async function POST(req: NextRequest) {
 
         Evaluate objectively. Be specific and constructive. Provide:
         - score: 0–100 integer
-        - strengths: 1–4 specific things they did well
-        - weaknesses: 1–4 specific gaps or errors
+        - strengths: 0–4 specific things done well — if almost nothing is redeeming, omit or use minor positives (effort to engage, a related term attempted)
+        - weaknesses: 0–4 gaps or errors — cite concrete issues where possible
         - suggestions: 2–3 sentences on how to improve
         - modelAnswer: a concise ideal answer (150–250 words)
+
+        Respond with ONLY valid structured output matching the schema. Never use empty weaknesses when the score is below 70 — always include actionable gaps.
       `,
     });
 

@@ -15,14 +15,14 @@ export const SubmitAnswerSchema = z.object({
   questionId: z.string().min(1, "Invalid question ID"),
   content: z
     .string()
-    .min(50, "Write at least 50 characters")
+    .min(1, "Answer cannot be empty")
     .max(3000, "Answer too long"),
 });
 
 export const FeedbackSchema = z.object({
   score: z.number().min(0).max(100),
-  strengths: z.array(z.string()).min(1).max(4),
-  weaknesses: z.array(z.string()).min(1).max(4),
+  strengths: z.array(z.string()).min(0).max(4),
+  weaknesses: z.array(z.string()).min(0).max(4),
   suggestions: z.string(),
   modelAnswer: z.string(),
 });

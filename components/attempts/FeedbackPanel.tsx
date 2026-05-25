@@ -108,22 +108,34 @@ export function FeedbackPanel({ attempt }: { attempt: Attempt }) {
             <p className="mb-3 flex items-center gap-2 text-sm font-bold text-emerald-800 dark:text-emerald-200">
               <CheckCircle2 className="h-4 w-4 shrink-0" /> Strengths
             </p>
-            <ul className="list-disc space-y-2 pl-4 text-sm leading-snug text-muted-foreground marker:text-emerald-600">
-              {attempt.aiStrengths.map((s, i) => (
-                <li key={i}>{s}</li>
-              ))}
-            </ul>
+            {attempt.aiStrengths.length === 0 ? (
+              <p className="text-sm italic leading-relaxed text-muted-foreground">
+                No clear strengths identified for this attempt — keep practicing the core concepts.
+              </p>
+            ) : (
+              <ul className="list-disc space-y-2 pl-4 text-sm leading-snug text-muted-foreground marker:text-emerald-600">
+                {attempt.aiStrengths.map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="rounded-xl border border-red-500/15 bg-red-500/[0.05] p-5 dark:bg-red-500/[0.08]">
             <p className="mb-3 flex items-center gap-2 text-sm font-bold text-red-800 dark:text-red-200">
               <XCircle className="h-4 w-4 shrink-0" /> Needs improvement
             </p>
-            <ul className="list-disc space-y-2 pl-4 text-sm leading-snug text-muted-foreground marker:text-red-600">
-              {attempt.aiWeaknesses.map((w, i) => (
-                <li key={i}>{w}</li>
-              ))}
-            </ul>
+            {attempt.aiWeaknesses.length === 0 ? (
+              <p className="text-sm italic leading-relaxed text-muted-foreground">
+                See suggestions and model answer for guidance.
+              </p>
+            ) : (
+              <ul className="list-disc space-y-2 pl-4 text-sm leading-snug text-muted-foreground marker:text-red-600">
+                {attempt.aiWeaknesses.map((w, i) => (
+                  <li key={i}>{w}</li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 

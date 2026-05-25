@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  createdAt     DateTime  @default(now())
+
+  accounts Account[]
+  attempts Attempt[]
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Question {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  difficulty  Difficulty
+  domain      Domain
+  tags        String[]
+  createdAt   DateTime   @default(now())
+
+  attempts Attempt[]
+
+  @@index([domain, difficulty])
+}
+
+model Attempt {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  questionId  String   @db.ObjectId
+  content     String
+  submittedAt DateTime @default(now())
+
+  aiScore        Float?
+  aiStrengths    String[]
+  aiWeaknesses   String[]
+  aiSuggestions  String         @default("")
+  aiModelAnswer  String         @default("")
+  feedbackStatus FeedbackStatus @default(PENDING)
+
+  user     User     @relation(fields: [userId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@index([userId])
+  @@index([questionId])
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum Domain {
+  JAVASCRIPT
+  REACT
+  NODEJS
+  TYPESCRIPT
+  SYSTEM_DESIGN
+  BEHAVIORAL
+  DATA_STRUCTURES
+  DATABASES
+}
+
+enum FeedbackStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}

@@ -93,7 +93,7 @@ function AnswerComposeForm({
           <p className="text-xs text-muted-foreground text-right max-w-md">
             {isListening
               ? "Pause typing while recording — Stop dictation to edit."
-              : "Works in Chrome and Edge — uses your microphone."}
+              : ""}
           </p>
         </div>
       )}

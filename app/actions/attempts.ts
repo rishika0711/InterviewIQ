@@ -6,6 +6,10 @@ import { auth } from "@/lib/auth";
 import { aiModel } from "@/lib/ai";
 import { prisma } from "@/lib/prisma";
 import { FeedbackSchema, SubmitAnswerSchema } from "@/lib/validations";
+import {
+  DATABASE_UNAVAILABLE_MESSAGE,
+  isMongoConnectivityFailure,
+} from "@/lib/db-errors";
 
 export type SubmitAnswerState = {
   error?: string;
@@ -124,6 +128,42 @@ export async function generateFeedbackAction(attemptId: string) {
     const message =
       err instanceof Error ? err.message : "AI feedback failed";
     return { error: `AI feedback failed: ${message}` };
+  }
+}
+
+export async function deleteAttemptAction(attemptId: string) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { error: "Unauthorized" as const };
+  }
+
+  const id = typeof attemptId === "string" ? attemptId.trim() : "";
+  if (!id) {
+    return { error: "Invalid attempt id" as const };
+  }
+
+  try {
+    const owned = await prisma.attempt.findFirst({
+      where: { id, userId: session.user.id },
+      select: { id: true, questionId: true },
+    });
+    if (!owned) {
+      return { error: "Attempt not found" as const };
+    }
+
+    await prisma.attempt.delete({ where: { id: owned.id } });
+
+    revalidatePath("/history");
+    revalidatePath("/dashboard");
+    revalidatePath(`/practice/${owned.questionId}`);
+
+    return { success: true as const };
+  } catch (e) {
+    if (isMongoConnectivityFailure(e)) {
+      return { error: DATABASE_UNAVAILABLE_MESSAGE };
+    }
+    console.error("[deleteAttemptAction]", e);
+    return { error: "Could not delete attempt" as const };
   }
 }
 

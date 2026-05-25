@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { Brain } from "lucide-react";
+import { Brain, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,6 +25,7 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
   function handleGoogleSignIn() {
@@ -45,16 +46,18 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
       redirect: false,
     });
 
-    setLoading(false);
-
     if (result?.error) {
+      setLoading(false);
       setError("Invalid email or password");
       return;
     }
 
+    setRedirecting(true);
     router.push("/dashboard");
     router.refresh();
   }
+
+  const busy = loading || redirecting || googleLoading;
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center p-4 pt-16 pb-24">
@@ -86,10 +89,22 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
 
         <Card
           className={cn(
-            "border-border/80 shadow-xl shadow-primary/5",
+            "relative border-border/80 shadow-xl shadow-primary/5",
             "backdrop-blur-sm bg-card/95"
           )}
         >
+          {redirecting && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-card/85 backdrop-blur-sm"
+            >
+              <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />
+              <p className="text-sm font-semibold text-foreground">
+                Signed in — taking you to your dashboard…
+              </p>
+            </div>
+          )}
           <CardHeader className="space-y-1 pb-2">
             <CardTitle className="text-xl">Sign in</CardTitle>
             <CardDescription className="text-[15px]">
@@ -105,12 +120,16 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
                   variant="outline"
                   className="w-full h-11 gap-2 border-border shadow-sm hover:bg-muted/80"
                   type="button"
-                  disabled={googleLoading}
+                  disabled={busy}
                   onClick={handleGoogleSignIn}
                 >
-                  <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-muted text-[10px] font-bold tracking-tighter">
-                    G
-                  </span>
+                  {googleLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  ) : (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-muted text-[10px] font-bold tracking-tighter">
+                      G
+                    </span>
+                  )}
                   {googleLoading ? "Redirecting to Google…" : "Continue with Google"}
                 </Button>
 
@@ -157,8 +176,19 @@ export function LoginForm({ googleEnabled }: LoginFormProps) {
               {error && (
                 <p className="text-sm text-destructive font-medium">{error}</p>
               )}
-              <Button type="submit" className="w-full h-11 text-base shadow-md" disabled={loading}>
-                {loading ? "Signing in…" : "Sign in"}
+              <Button
+                type="submit"
+                className="w-full h-11 text-base shadow-md gap-2"
+                disabled={busy}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    Signing in…
+                  </>
+                ) : (
+                  "Sign in"
+                )}
               </Button>
             </form>
 

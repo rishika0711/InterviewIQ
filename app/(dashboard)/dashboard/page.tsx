@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { StatsRow } from "@/components/dashboard/StatsRow";
@@ -17,7 +18,10 @@ import { ArrowUpRight } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
-  const userId = session!.user!.id;
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+  const userId = session.user.id;
 
   const attempts = await prisma.attempt.findMany({
     where: { userId },

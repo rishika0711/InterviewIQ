@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnswerForm } from "@/components/attempts/AnswerForm";
@@ -17,6 +17,9 @@ export default async function QuestionPage({
 }) {
   const { id } = await params;
   const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
 
   const question = await prisma.question.findUnique({
     where: { id },
@@ -24,12 +27,10 @@ export default async function QuestionPage({
 
   if (!question) notFound();
 
-  const latestAttempt = session?.user?.id
-    ? await prisma.attempt.findFirst({
-        where: { questionId: id, userId: session.user.id },
-        orderBy: { submittedAt: "desc" },
-      })
-    : null;
+  const latestAttempt = await prisma.attempt.findFirst({
+    where: { questionId: id, userId: session.user.id },
+    orderBy: { submittedAt: "desc" },
+  });
 
   return (
     <div className="max-w-3xl space-y-8">

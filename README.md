@@ -64,6 +64,16 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+### Demo credentials (testing)
+
+A demo account is available so reviewers can skip registration:
+
+| Email | Password |
+|---|---|
+| `demo@gmail.com` | `demo1234` |
+
+Sign in at `/login` with these credentials. Replace or remove this account on production deployments — it is intended for local testing only.
+
 ### Google sign-in setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **Credentials**.

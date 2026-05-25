@@ -13,6 +13,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -33,10 +34,10 @@ function SidebarNav({
   return (
     <>
       <div className="flex items-center gap-3 px-5 py-6 border-b border-border/60">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/15">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/15">
           <Brain className="h-5 w-5 text-primary" aria-hidden />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <span className="text-base font-bold tracking-tight truncate block">
             InterviewIQ
           </span>
@@ -44,6 +45,7 @@ function SidebarNav({
             Interview prep
           </span>
         </div>
+        <ThemeToggle className="shrink-0" />
       </div>
       <nav className="flex-1 space-y-0.5 p-4">
         <p className="px-3 mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -95,16 +97,19 @@ export function Sidebar() {
           <Brain className="h-8 w-8 shrink-0 text-primary" />
           <span className="truncate font-semibold tracking-tight">InterviewIQ</span>
         </div>
-        <Button
-          variant="outline"
-          size="icon"
-          className="shrink-0 rounded-xl"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          aria-label="Toggle menu"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <ThemeToggle />
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 rounded-xl"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-label="Toggle menu"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
 
       {open && (

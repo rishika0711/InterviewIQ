@@ -15,6 +15,40 @@ type Props = {
   data: { submittedAt: Date; aiScore: number | null }[];
 };
 
+type TooltipPayload = { value: number; payload: { date: string; attempt: number } };
+
+function ChartTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: TooltipPayload[];
+}) {
+  if (!active || !payload || payload.length === 0) return null;
+  const item = payload[0];
+  const score = typeof item.value === "number" ? Math.round(item.value) : item.value;
+  const scoreColor =
+    typeof score === "number"
+      ? score >= 75
+        ? "text-emerald-600 dark:text-emerald-400"
+        : score >= 50
+          ? "text-amber-600 dark:text-amber-400"
+          : "text-red-600 dark:text-red-400"
+      : "text-foreground";
+
+  return (
+    <div className="rounded-xl border border-border bg-popover px-3 py-2 text-popover-foreground shadow-lg">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Attempt {item.payload.attempt} · {item.payload.date}
+      </p>
+      <p className={`mt-0.5 text-base font-bold tabular-nums ${scoreColor}`}>
+        {score}
+        <span className="ml-0.5 text-xs text-muted-foreground">/100</span>
+      </p>
+    </div>
+  );
+}
+
 export function ScoreChart({ data }: Props) {
   const chartData = data
     .filter((a) => a.aiScore !== null)
@@ -38,43 +72,42 @@ export function ScoreChart({ data }: Props) {
   return (
     <div className="rounded-xl border border-border/50 bg-muted/10 p-2 sm:p-4 -mx-1">
       <ResponsiveContainer width="100%" height={220}>
-        <LineChart data={chartData} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
+        <LineChart data={chartData} margin={{ top: 12, right: 16, left: -8, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border/70" vertical={false} />
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+            tick={{ fontSize: 11, fill: "currentColor" }}
+            className="text-muted-foreground"
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             domain={[0, 100]}
             ticks={[0, 25, 50, 75, 100]}
-            tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+            tick={{ fontSize: 11, fill: "currentColor" }}
+            className="text-muted-foreground"
             tickLine={false}
             axisLine={false}
             width={32}
           />
           <Tooltip
-            contentStyle={{
-              borderRadius: "10px",
-              border: "1px solid hsl(var(--border))",
-              backgroundColor: "hsl(var(--card))",
-              boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.08)",
-            }}
-            formatter={(val) => [`${val}/100`, "Score"]}
+            cursor={{ stroke: "currentColor", strokeOpacity: 0.18, strokeDasharray: "4 4" }}
+            wrapperStyle={{ outline: "none" }}
+            content={<ChartTooltip />}
           />
           <Line
             type="monotone"
             dataKey="score"
-            stroke="hsl(var(--primary))"
+            stroke="currentColor"
+            className="text-primary"
             strokeWidth={2.5}
             dot={{
               r: 4,
-              fill: "hsl(var(--background))",
-              stroke: "hsl(var(--primary))",
+              className: "fill-background",
+              stroke: "currentColor",
               strokeWidth: 2,
             }}
-            activeDot={{ r: 6, strokeWidth: 0 }}
+            activeDot={{ r: 6, strokeWidth: 2, className: "fill-primary stroke-background" }}
           />
         </LineChart>
       </ResponsiveContainer>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { Brain } from "lucide-react";
+import { Brain, Loader2 } from "lucide-react";
 import { registerUser, type ActionState } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,7 @@ export function RegisterForm({ googleEnabled }: RegisterFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [state, formAction, isPending] = useActionState(
     registerUser,
     initialState
@@ -42,6 +43,7 @@ export function RegisterForm({ googleEnabled }: RegisterFormProps) {
   useEffect(() => {
     if (!state.success || !formRef.current) return;
 
+    setRedirecting(true);
     const formData = new FormData(formRef.current);
     signIn("credentials", {
       email: formData.get("email") as string,
@@ -56,6 +58,8 @@ export function RegisterForm({ googleEnabled }: RegisterFormProps) {
       router.refresh();
     });
   }, [state.success, router]);
+
+  const busy = isPending || redirecting || googleLoading;
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center p-4 pt-16 pb-24">
@@ -85,10 +89,22 @@ export function RegisterForm({ googleEnabled }: RegisterFormProps) {
 
         <Card
           className={cn(
-            "border-border/80 shadow-xl shadow-primary/5",
+            "relative border-border/80 shadow-xl shadow-primary/5",
             "backdrop-blur-sm bg-card/95"
           )}
         >
+          {redirecting && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-card/85 backdrop-blur-sm"
+            >
+              <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />
+              <p className="text-sm font-semibold text-foreground">
+                Account created — signing you in…
+              </p>
+            </div>
+          )}
           <CardHeader className="space-y-1 pb-2">
             <CardTitle className="text-xl">Register</CardTitle>
             <CardDescription className="text-[15px]">
@@ -102,12 +118,16 @@ export function RegisterForm({ googleEnabled }: RegisterFormProps) {
                   variant="outline"
                   className="w-full h-11 gap-2 border-border shadow-sm hover:bg-muted/80"
                   type="button"
-                  disabled={googleLoading}
+                  disabled={busy}
                   onClick={handleGoogleSignIn}
                 >
-                  <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-muted text-[10px] font-bold tracking-tighter">
-                    G
-                  </span>
+                  {googleLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  ) : (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-muted text-[10px] font-bold tracking-tighter">
+                      G
+                    </span>
+                  )}
                   {googleLoading ? "Redirecting to Google…" : "Continue with Google"}
                 </Button>
 
@@ -173,8 +193,19 @@ export function RegisterForm({ googleEnabled }: RegisterFormProps) {
               {state.error && (
                 <p className="text-sm text-destructive font-medium">{state.error}</p>
               )}
-              <Button type="submit" className="w-full h-11 text-base shadow-md" disabled={isPending}>
-                {isPending ? "Creating account…" : "Create account"}
+              <Button
+                type="submit"
+                className="w-full h-11 text-base shadow-md gap-2"
+                disabled={busy}
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    Creating account…
+                  </>
+                ) : (
+                  "Create account"
+                )}
               </Button>
             </form>
 

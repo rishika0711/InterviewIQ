@@ -9,7 +9,6 @@ AI-powered interview prep platform for developers. Browse questions by domain, w
 - **AI Feedback** — Gemini 2.5 Flash evaluation via Vercel AI SDK
 - **Dashboard** — Stats, progress chart (Recharts), recent attempts
 - **History** — Full attempt history with scores
-- **Rate Limiting** — 15 AI requests/hour per user (Upstash Redis)
 - **Server Actions** — Answer submission and AI feedback via server actions
 
 ## Tech Stack
@@ -19,7 +18,6 @@ AI-powered interview prep platform for developers. Browse questions by domain, w
 - NextAuth.js v5
 - Vercel AI SDK + Google Gemini 2.5 Flash
 - Tailwind CSS + shadcn/ui
-- Upstash Redis
 - GitHub Actions CI
 
 ## Getting Started
@@ -48,8 +46,6 @@ cp .env.example .env.local
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `GOOGLE_AI_API_KEY` | Gemini API key from AI Studio |
-| `UPSTASH_REDIS_REST_URL` | Upstash Redis URL (optional locally) |
-| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis token (optional locally) |
 
 For `DATABASE_URL`, use the Atlas **Drivers** URI verbatim. If you edit it by hand and the DB password contains `@`, `:`, `/`, `?`, `#`, or `]`, those characters **must be percent-encoded** or the connector will mis-parse the URI and TLS can fail in confusing ways.
 
@@ -95,7 +91,7 @@ components/
 ├── questions/        # QuestionCard, QuestionFilters
 ├── attempts/         # AnswerForm, FeedbackPanel
 └── dashboard/        # StatsRow, ScoreChart
-lib/                  # prisma, auth, ai, ratelimit, validations
+lib/                  # prisma, auth, ai, validations
 prisma/               # schema + seed (32 questions)
 ```
 

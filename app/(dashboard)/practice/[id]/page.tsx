@@ -79,11 +79,8 @@ export default async function QuestionPage({
           </div>
         </CardHeader>
         <CardContent className="pt-8 pb-8">
-          <div className="space-y-2 mb-6">
+          <div className="mb-6">
             <h2 className="text-lg font-semibold tracking-tight">Your answer</h2>
-            <p className="text-sm text-muted-foreground">
-              Aim for specificity and structure — minimum 50 characters.
-            </p>
           </div>
           <Separator className="mb-8 opacity-60" />
           <AnswerForm questionId={question.id} existingAttempt={latestAttempt} />

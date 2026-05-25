@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { aiModel } from "@/lib/ai";
 import { prisma } from "@/lib/prisma";
-import { checkRateLimit } from "@/lib/ratelimit";
 import { FeedbackSchema, SubmitAnswerSchema } from "@/lib/validations";
 
 export type SubmitAnswerState = {
@@ -59,11 +58,6 @@ export async function generateFeedbackAction(attemptId: string) {
   const session = await auth();
   if (!session?.user?.id) {
     return { error: "Unauthorized" };
-  }
-
-  const { success } = await checkRateLimit(session.user.id);
-  if (!success) {
-    return { error: "Too many requests. Try again in an hour." };
   }
 
   const attempt = await prisma.attempt.findUnique({

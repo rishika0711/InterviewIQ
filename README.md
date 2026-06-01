@@ -1,5 +1,9 @@
 # InterviewIQ
 
+# Notes
+- For transcription features, please use Google Chrome.
+- Transcription support is recommended in Chrome.
+  
 **InterviewIQ** is an AI-powered interview prep platform for developers. Practice real technical and behavioral questions, submit written answers, and get instant structured feedback — scores, strengths, gaps, suggestions, and model answers — so you can improve faster without waiting for a mock interviewer.
 
 Built as a full-stack Next.js application with authentication, progress tracking, and Gemini-powered evaluation.
